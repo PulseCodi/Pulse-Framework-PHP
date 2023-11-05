@@ -30,9 +30,7 @@ error_reporting(E_ALL);
 // Autocargar Bibliotecas Principales
 // El nombre de la clase y el nombre del archivo son iguales, por lo que se buscará
 // el archivo correspondiente en la ruta System según el nombre de la clase.
-spl_autoload_register(function($className) {
-    require_once SYSTEM_PATH . $className . '.php';
-});
+require_once SYSTEM_PATH . 'Autoload.php';
 
 // Ruta al archivo de rutas de la aplicación.
 $routes = CONFIGS_PATH . 'routes.php';

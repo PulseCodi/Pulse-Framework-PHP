@@ -12,6 +12,8 @@ $config['time_zone'] = 'America/Bogota';
 
 // Entorno de la aplicación (puede ser 'development', 'production', etc.).
 $config['enviroment'] = 'development';
+$config['display_errors'] = 'On';
+$config['error_reporting'] = E_ALL;
 
 // Configuración para la protección contra ataques CSRF (Cross-Site Request Forgery).
 $config['csrf_token_name'] = 'csrf_token';
