@@ -1,0 +1,16 @@
+# Archivo de configuración de Apache que puede utilizarse para configurar las reglas de redirección y reescritura de URL.
+
+RewriteEngine On
+RewriteBase /myframework/
+
+# Permite el acceso a la carpeta 'public' y todas sus rutas
+# RewriteRule ^public/ - [L]
+
+# Redirige cualquier otro acceso al directorio principal a una página de error (por ejemplo, 403 Prohibido)
+# RewriteRule ^system/ - [F]
+# RewriteRule ^app/ - [F]
+
+# Redirige todas las solicitudes que no sean para archivos o directorios existentes a index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
