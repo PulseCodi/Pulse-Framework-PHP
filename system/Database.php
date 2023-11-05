@@ -28,7 +28,6 @@ class Database
         } catch (PDOException $e) {
             // En caso de un error en la conexión, se captura la excepción y se muestra un mensaje de error.
             $this->error = $e->getMessage();
-            echo $this->error;
         }
     }
 
