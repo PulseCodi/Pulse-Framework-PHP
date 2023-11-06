@@ -1,50 +1,51 @@
-
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 class Database
 {
-  private $dbh;
-  private $stmt;
-  private $error;
-  private $db;
-  public function __construct()
-  {
-      $database = $this->getDatabaseConfig();
-      if(empty($database['hostname']) || empty($database['dataname']) || empty($database['username']) || empty($database['password']) || empty($database['charset'])) {
-          $this->error = "The database configuration is incorrect!";
-          error_log($this->error);
-          return;
-      }
-      $dsn = 'mysql:host=' . $database['hostname'] . ';dbname=' . $database['dataname'];
-      $options = array(
-          PDO::ATTR_PERSISTENT => true,
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-      );
-      // Establish a new database connection
-      try {
-          $this->dbh = new PDO($dsn, $database['username'], $database['password'], $options);
-          $this->dbh->exec('set names ' . $database['charset']);
-      } catch (PDOException $e) {
-          $this->error = $e->getMessage();
-          // Log errors for debugging purposes
-          error_log($this->error);
-      }
-  }
-  // Loads the database configuration from a local file
-  private function getDatabaseConfig()
-  {
-      if(file_exists(CONFIGS_PATH . 'database.php')) {
-          return require_once CONFIGS_PATH . 'database.php';
-      } else {
-          error_log("The Database configuration file does not exist!");
-          return [];
-      }
-  }
-  // Check error state
-  public function hasError() {
-      return !empty($this->error);
-  }
+    private $dbh;
+    private $stmt;
+    private $error;
+    private $db;
+
+    public function __construct()
+    {
+        $database = $this->getDatabaseConfig();
+        if (empty($database['hostname']) || empty($database['dataname']) || empty($database['username']) || empty($database['password']) || empty($database['charset'])) {
+            throw new ErrorHandler("The database configuration is incorrect!");
+            return;
+        }
+        $dsn = 'mysql:host=' . $database['hostname'] . ';dbname=' . $database['dataname'];
+        $options = [
+            PDO::ATTR_PERSISTENT => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        ];
+        // Establish a new database connection
+        try {
+            $this->dbh = new PDO($dsn, $database['username'], $database['password'], $options);
+            $this->dbh->exec('set names ' . $database['charset']);
+        } catch (PDOException $e) {
+            $this->error = $e->getMessage();
+            throw new ErrorHandler($this->error);
+        }
+    }
+
+    // Loads the database configuration from a local file
+    private function getDatabaseConfig()
+    {
+        if (file_exists(CONFIGS_PATH . 'database.php')) {
+            return require_once CONFIGS_PATH . 'database.php';
+        } else {            
+            throw new ErrorHandler("The Database configuration file does not exist!");
+            return [];
+        }
+    }
+
+    // Check error state
+    public function hasError()
+    {
+        return !empty($this->error);
+    }
 
     // Start a new database transaction
     public function beginTransaction()
