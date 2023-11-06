@@ -1,65 +1,78 @@
+
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Database
 {
-    private $dbh;
-    private $stmt;
-    private $error;
-    private $db;
+  private $dbh;
+  private $stmt;
+  private $error;
+  private $db;
+  public function __construct()
+  {
+      $database = $this->getDatabaseConfig();
+      if(empty($database['hostname']) || empty($database['dataname']) || empty($database['username']) || empty($database['password']) || empty($database['charset'])) {
+          $this->error = "The database configuration is incorrect!";
+          error_log($this->error);
+          return;
+      }
+      $dsn = 'mysql:host=' . $database['hostname'] . ';dbname=' . $database['dataname'];
+      $options = array(
+          PDO::ATTR_PERSISTENT => true,
+          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+      );
+      // Establish a new database connection
+      try {
+          $this->dbh = new PDO($dsn, $database['username'], $database['password'], $options);
+          $this->dbh->exec('set names ' . $database['charset']);
+      } catch (PDOException $e) {
+          $this->error = $e->getMessage();
+          // Log errors for debugging purposes
+          error_log($this->error);
+      }
+  }
+  // Loads the database configuration from a local file
+  private function getDatabaseConfig()
+  {
+      if(file_exists(CONFIGS_PATH . 'database.php')) {
+          return require_once CONFIGS_PATH . 'database.php';
+      } else {
+          error_log("The Database configuration file does not exist!");
+          return [];
+      }
+  }
+  // Check error state
+  public function hasError() {
+      return !empty($this->error);
+  }
 
-    public function __construct()
-    {
-        require_once CONFIGS_PATH . 'database.php';
-
-        // Se obtienen los datos de configuración de la base de datos desde un archivo externo (database.php).
-        $dsn = 'mysql:host=' . $database['hostname'] . ';dbname=' . $database['dataname'];
-        $options = array(
-            PDO::ATTR_PERSISTENT => true, // Establece la conexión persistente para mejorar el rendimiento.
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION // Habilita el manejo de excepciones.
-        );
-
-        try {
-            // Se crea una instancia de PDO para establecer la conexión con la base de datos.
-            $this->dbh = new PDO($dsn, $database['username'], $database['password'], $options);
-
-            // Se establece el juego de caracteres para la conexión.
-            $this->dbh->exec('set names ' . $database['charset']);
-        } catch (PDOException $e) {
-            // En caso de un error en la conexión, se captura la excepción y se muestra un mensaje de error.
-            $this->error = $e->getMessage();
-        }
-    }
-
-    // A continuación, se definen varios métodos que permiten interactuar con la base de datos.
-
+    // Start a new database transaction
     public function beginTransaction()
     {
-        // Inicia una transacción en la base de datos.
         return $this->dbh->beginTransaction();
     }
 
+    // Rollback the current transaction
     public function rollBack()
     {
-        // Revierte una transacción pendiente.
         return $this->dbh->rollBack();
     }
 
+    // Commit the current transaction
     public function commit()
     {
-        // Confirma una transacción pendiente.
         return $this->dbh->commit();
     }
 
+    // Prepare a new SQL statement for execution
     public function query($sql)
     {
-        // Prepara una consulta SQL para su ejecución.
         $this->stmt = $this->dbh->prepare($sql);
     }
 
+    // Bind values to parameters in the prepared statement
     public function bind($param, $value, $type = null)
     {
-        // Vincula valores a parámetros en la consulta preparada.
         if (is_null($type)) {
             switch (true) {
                 case is_int($value):
@@ -75,39 +88,38 @@ class Database
                     $type = PDO::PARAM_STR;
             }
         }
-
         $this->stmt->bindValue($param, $value, $type);
     }
 
+    // Execute the prepared statement
     public function execute()
     {
-        // Ejecuta la consulta preparada.
         return $this->stmt->execute();
     }
 
+    // Execute the statement, then return all results
     public function result()
     {
-        // Ejecuta la consulta y devuelve el resultado como un conjunto de objetos.
         $this->execute();
         return $this->stmt->fetchAll(PDO::FETCH_OBJ);
     }
 
+    // Execute the statement, then return a single row
     public function row()
     {
-        // Ejecuta la consulta y devuelve una sola fila como objeto.
         $this->execute();
         return $this->stmt->fetch(PDO::FETCH_OBJ);
     }
 
+    // Get the number of rows affected by the current SQL statement
     public function affectedRows()
     {
-        // Obtiene el número de filas afectadas por la última consulta.
         return $this->stmt->rowCount();
     }
 
+    // Get the ID of the last inserted item
     public function lastInsertId()
     {
-        // Obtiene el ID del último elemento insertado en la base de datos.
         return $this->dbh->lastInsertId();
     }
 }
