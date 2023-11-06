@@ -16,6 +16,13 @@ class HomeController extends Controller
         $this->userModel = $this->model('userModel');
     }
 
+	private function load_views($views = [], $data = [])
+	{
+	    foreach ($views as $view) {
+	        $this->view($view, $data);
+	    }
+	}
+
 	public function index()
 	{
 		// Cargar la clase File
@@ -35,6 +42,6 @@ class HomeController extends Controller
 	    ];
 
 	    // Llamar a la vista 'home' y pasar datos
-	    $this->view('home/index', $data);
+	    $this->load_views(['layouts/header', 'home/index', 'layouts/footer'], $data);
 	}
 }
