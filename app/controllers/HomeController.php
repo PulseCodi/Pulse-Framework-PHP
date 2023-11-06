@@ -1,7 +1,4 @@
 <?php
-
-// Aquí se encuentran los controladores que manejan las solicitudes de los usuarios.
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class HomeController extends Controller
@@ -36,8 +33,8 @@ class HomeController extends Controller
 
 		// Datos que deseas pasar a la vista
 	    $data = [
-	        'title' => 'Página de inicio',
-	        'content' => 'Bienvenido a mi sitio web',
+	        'title' => 'Inicio - PULSE Framework PHP',
+	        'footer' => 'Desarrollado con <span style="color: red;">♥</span> - PulseCodify',
 	        'modelo' => $this->userModel->pruebaModel()
 	    ];
 

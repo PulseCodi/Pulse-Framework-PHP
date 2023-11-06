@@ -1,3 +1,30 @@
 body {
-    background-color: brown;
+    background-color: black;
+/*    height: 100vh;*/
+    padding-top: 5%;
+    margin: 0;
+    font-family: 'Exo 2', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+}
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 20px;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+/*    height: calc(100vh - 40px);*/
+}
+.description {
+    margin-top: 10px;
+    text-align: center;
+    width: 45%;
 }

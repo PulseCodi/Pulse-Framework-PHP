@@ -5,7 +5,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // Configuración de la URL base de la aplicación.
-$config['base_url'] = 'http://localhost/myframework';
+$config['base_url'] = 'http://localhost/pulse-framework-php';
 
 // Zona horaria de la aplicación.
 $config['time_zone'] = 'America/Bogota';
