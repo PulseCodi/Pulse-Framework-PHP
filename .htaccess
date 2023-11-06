@@ -1,16 +1,19 @@
-# Archivo de configuración de Apache que puede utilizarse para configurar las reglas de redirección y reescritura de URL.
+# Apache configuration file for URL rewrite rules and redirection.
 
-RewriteEngine On
-RewriteBase /pulse-framework-php/
+# Enables the runtime rewriting engine
+RewriteEngine On 
 
-# Permite el acceso a la carpeta 'public' y todas sus rutas
-# RewriteRule ^public/ - [L]
+# Sets the base URL for per-directory rewrites
+RewriteBase /Pulse-Framework-PHP/ 
 
-# Redirige cualquier otro acceso al directorio principal a una página de error (por ejemplo, 403 Prohibido)
-# RewriteRule ^system/ - [F]
-# RewriteRule ^app/ - [F]
+# This section allows access to the 'public' directory and all its routes
+RewriteRule ^public/ - [L]
 
-# Redirige todas las solicitudes que no sean para archivos o directorios existentes a index.php
+# Redirects any non-allowed access to the main directory to an error page (e.g., 403 Forbidden)
+RewriteRule ^system/ - [F]
+RewriteRule ^app/ - [F]
+
+# If the requested filename is not an existing file or directory, it redirects the request to index.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
