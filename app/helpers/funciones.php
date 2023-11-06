@@ -1,46 +1,42 @@
 <?php
-
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
 function show($data)
 {
-  if (isset($data)) {
-    ob_start();
-    echo '<pre>';
-    print_r($data);
-    echo '</pre>';
-    $response = ob_get_clean();
+    if (isset($data)) {
+        ob_start();
+        echo '<pre>';
+        print_r($data);
+        echo '</pre>';
+        $response = ob_get_clean();
 
-    error_log($response);  // Logs the response instead of echoing out and dying
-  } else {
-    error_log("Data input is not set");
-  }
+        error_log($response); // Logs the response instead of echoing out and dying
+    } else {
+        error_log("Data input is not set");
+    }
 }
 
 function base_url($data = null)
 {
-  if(file_exists(CONFIGS_PATH . 'config.php'))
-  {
-    require CONFIGS_PATH . 'config.php';
+    if (file_exists(CONFIGS_PATH . 'config.php')) {
+        require CONFIGS_PATH . 'config.php';
 
-    if (isset($config['base_url'])) {
-      $base_url = rtrim($config['base_url'], '/');
-      $base_url = $base_url . $data;
-      return $base_url;
+        if (isset($config['base_url'])) {
+            $base_url = rtrim($config['base_url'], '/');
+            $base_url = $base_url . $data;
+            return $base_url;
+        } else {
+            error_log("No 'base_url' key in the configuration.");
+            return false;
+        }
+    } else {
+        error_log("Config file " . CONFIGS_PATH . 'config.php' . " does not exist.");
+        return false;
     }
-    else 
-    {
-      error_log("No 'base_url' key in the configuration.");
-      return false;
-    }
-  } else
-  {
-    error_log("Config file ".CONFIGS_PATH . 'config.php'." does not exist.");
-    return false;
-  }
 }
 
-function redirect($url) {
+function redirect($url)
+{
     // Check if URL is relative
     if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
         // For relative URLs, concatenate with base URL
@@ -52,24 +48,24 @@ function redirect($url) {
     exit();
 }
 
-function sanitize_input($data) {
+function sanitize_input($data)
+{
     $data = trim($data);
     $data = stripslashes($data);
     $data = htmlspecialchars($data);
     return $data;
 }
 
-function encrypter($input) {
+function encrypter($input)
+{
+    if (file_exists(CONFIGS_PATH . 'config.php')) {
+        require CONFIGS_PATH . 'config.php';
+        $customSalt = $config['salt'];
+    } else {
+        error_log("Config file " . CONFIGS_PATH . 'config.php' . " does not exist.");
+        return false;
+    }
 
-  if(file_exists(CONFIGS_PATH . 'config.php'))
-  {
-    require CONFIGS_PATH . 'config.php';
-    $customSalt = $config['salt'];
-  } else {
-    error_log("Config file ".CONFIGS_PATH . 'config.php'." does not exist.");
-    return false;
-  }
-  
     if ($customSalt !== null) {
         $salt = $customSalt;
     } else {
@@ -89,7 +85,8 @@ function encrypter($input) {
     return $encryptedData;
 }
 
-function decrypter($input, $storedData) {
+function decrypter($input, $storedData)
+{
     // Extraer la sal del dato almacenado
     $salt = substr($storedData, 0, 32);
 
@@ -102,36 +99,40 @@ function decrypter($input, $storedData) {
     return $isVerified;
 }
 
-function set_flashmessage($type, $text) {
-  // Store the message type and text in the session.
-  $_SESSION['messages'][] = array(
-    'type' => $type,
-    'text' => $text
-  );
+function set_flashmessage($type, $text)
+{
+    // Store the message type and text in the session.
+    $_SESSION['messages'][] = [
+        'type' => $type,
+        'text' => $text,
+    ];
 }
-function get_flashmessage() {
-  // If there are any messages in the session, return the type of the most recent one.
-  if(isset($_SESSION['messages']) && count($_SESSION['messages']) > 0) {
-    return $_SESSION['messages'][count($_SESSION['messages']) - 1]['type'];
-  }
+function get_flashmessage()
+{
+    // If there are any messages in the session, return the type of the most recent one.
+    if (isset($_SESSION['messages']) && count($_SESSION['messages']) > 0) {
+        return $_SESSION['messages'][count($_SESSION['messages']) - 1]['type'];
+    }
 
-  return null;
+    return null;
 }
-function render_flasmessage() {
-  // If there are any messages in the session, fetch the most recent one.
-  if(isset($_SESSION['messages']) && count($_SESSION['messages']) > 0) {
-    $msg = $_SESSION['messages'][count($_SESSION['messages']) - 1]['text'];
+function render_flasmessage()
+{
+    // If there are any messages in the session, fetch the most recent one.
+    if (isset($_SESSION['messages']) && count($_SESSION['messages']) > 0) {
+        $msg = $_SESSION['messages'][count($_SESSION['messages']) - 1]['text'];
 
-    // Clear the messages from the session after they're fetched.
-    unset($_SESSION['messages']);
+        // Clear the messages from the session after they're fetched.
+        unset($_SESSION['messages']);
 
-    return $msg;
-  }
+        return $msg;
+    }
 
-  return null;
+    return null;
 }
 
-function secureInput($formId, $config = []) {
+function secureInput($formId, $config = [])
+{
     // Import the CSRF class
     require_once APPPATH . 'libraries/Csrf.php';
     $csrf = new Csrf();
@@ -142,7 +143,7 @@ function secureInput($formId, $config = []) {
     // Construct the main input field based on configuration
     $input_field = "<input type='hidden' name='csrf_token' ";
     foreach ($config as $attr => $value) {
-        $input_field .=  " $attr='$value'";
+        $input_field .= " $attr='$value'";
     }
     $input_field .= " value='$csrf_token'>";
 
@@ -150,8 +151,29 @@ function secureInput($formId, $config = []) {
     return $input_field;
 }
 
-function get_errorvalidate($name) {
+function get_errorvalidate($name)
+{
     $message = $_SESSION['messages'][$name];
     unset($_SESSION['messages'][$name]); // Elimina el mensaje después de haber sido obtenido
     return $message;
+}
+
+function enviarRespuestaJSON($data)
+{
+    // Convierte los datos a formato JSON
+    $json = json_encode($data);
+
+    if ($json === false) {
+        // Si la conversión a JSON falla, generamos una respuesta de error
+        $response = [
+            'error' => 'Error al convertir datos a JSON',
+        ];
+        $json = json_encode($response);
+    }
+
+    // Establece la cabecera HTTP para indicar que la respuesta es JSON
+    header('Content-Type: application/json');
+
+    // Envía la respuesta JSON
+    echo $json;
 }

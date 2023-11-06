@@ -22,15 +22,6 @@ class HomeController extends Controller
 
 	public function index()
 	{
-		// Cargar la clase File
-		// $file = $this->load('libraries', 'File'); // Carga manual
-		// $file = $this->libraries['File']; // Carga automatica
-		// $file->prueba();
-
-		// Llamar a las funciones
-		// $file = $this->load('helpers', 'funciones'); // Carga manual
-		// show('hola');
-
 		// Datos que deseas pasar a la vista
 	    $data = [
 	        'title' => 'Inicio - PULSE Framework PHP',
