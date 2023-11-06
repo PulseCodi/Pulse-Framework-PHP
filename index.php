@@ -24,8 +24,8 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 date_default_timezone_set($config['time_zone']);
 
 // Configura la visibilidad de errores según el entorno.
-ini_set('display_errors', $config['enviroment'] === 'development' ? 'On' : 'off');
-error_reporting(E_ALL);
+ini_set('display_errors', $config['display_errors']);
+error_reporting($config['error_reporting']);
 
 // Autocargar Bibliotecas Principales
 // El nombre de la clase y el nombre del archivo son iguales, por lo que se buscará
