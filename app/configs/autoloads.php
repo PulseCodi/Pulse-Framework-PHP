@@ -1,5 +1,4 @@
 <?php
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // Desde aqui se carga las funciones helpers automaticamente ['funciones', 'moneda']
