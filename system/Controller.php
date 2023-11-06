@@ -23,30 +23,30 @@ class Controller
 
     protected function load($directory, $name)
     {
-        // Verificar si la libraria ya ha sido cargada
-        if (isset($this->libraries[$name])) {
-            // La libraria ya se ha cargado, no la cargues de nuevo
-            return $this->libraries[$name];
-        }
+      // Verificar si la libraria ya ha sido cargada
+      if (!isset($this->libraries[$name])) {
 
-        // Construir la ruta del archivo de la clase
-        $classFile = APP_PATH . $directory . '/' . $name . '.php';
+          // Construir la ruta del archivo de la clase
+          $classFile = APP_PATH . $directory . '/' . $name . '.php';
 
-        // Verificar si el archivo de la clase existe
-        if (!file_exists($classFile)) {
-            $this->_handleLoadError($directory, $name);
-        }
+          // Verificar si el archivo de la clase existe
+          if (!file_exists($classFile)) {
+              $this->_handleLoadError($directory, $name);
+          }
 
-        // Incluir el archivo de la clase
-        require $classFile;
+          // Incluir el archivo de la clase
+          require $classFile;
 
-        // Cargar la clase como una función o una biblioteca
-        $loadedItem = ($directory === 'helpers') ? $this->_loadFunction($name) : $this->_loadlibraries($name);
+          // Cargar la clase como una función o una biblioteca
+          $loadedItem = ($directory === 'helpers') ? $this->_loadFunction($name) : $this->_loadlibraries($name);
 
-        // Registrar la libreria cargada
-        $this->libraries[$name] = $loadedItem;
+          // Registrar la libreria cargada
+          $this->libraries[$name] = $loadedItem;
 
-        return $loadedItem;
+          return $loadedItem;
+      }
+      // La libraria ya se ha cargado, no la cargues de nuevo
+      return $this->libraries[$name];
     }
 
     private function _loadFunction($name)
@@ -100,6 +100,9 @@ class Controller
 
     public function view($view, $data = [])
     {
+        // Requerir el archivo que contiene la función base_url
+        require_once HELPERS_PATH . 'funciones.php';
+
         // Construir la ruta del archivo de la vista
         $viewFile = VIEWS_PATH . $view . '.php';
 
@@ -124,11 +127,13 @@ class Controller
             'vista' => 'vista',
         ];
 
+        $path = APP_PATH . $itemType . '/' . $name . '.php';
+  
         if (isset($errorTypes[$itemType])) {
             $itemTypeName = $errorTypes[$itemType];
-            throw new ErrorHandler("No se pudo cargar la $itemTypeName llamada '$name'");
+            throw new ErrorHandler("No se pudo cargar la $itemTypeName llamada '$name'. Expected at: $path");
         } else {
-            throw new ErrorHandler("No se pudo cargar la $itemType llamada '$name'");
+            throw new ErrorHandler("No se pudo cargar la $itemType llamada '$name'. Expected at: $path");
         }
     }
 }
